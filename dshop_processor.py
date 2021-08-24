@@ -71,6 +71,26 @@ dummy2 = DummyOperator(
     dag=dag
 )
 
+dummy3 = DummyOperator(
+    task_id='start_loading_to_silver',
+    dag=dag
+)
+
+dummy4 = DummyOperator(
+    task_id='finish_loading_to_silver',
+    dag=dag
+)
+
+dummy5 = DummyOperator(
+    task_id='start_loading_to_dwh',
+    dag=dag
+)
+
+dummy6 = DummyOperator(
+    task_id='finish_loading_to_dwh',
+    dag=dag
+)
+
 
 for call_date in return_dates():
     dummy1 >> load_to_bronze_out_of_stock(call_date.strftime("%Y-%m-%d")) >> dummy2
@@ -79,8 +99,8 @@ for table in return_tables('postgresql'):
     dummy1 >> load_to_bronze_db_tables(table) >> dummy2
 
 for table in return_tables('loadtosilver'):
-    dummy1 >> load_to_silver_group(table) >> dummy2
+    dummy3 >> load_to_silver_group(table) >> dummy4
 
 for table in return_tables('loadtodwh'):
-    dummy1 >> load_to_dwh_group(table) >> dummy2
+    dummy5 >> load_to_dwh_group(table) >> dummy6
 
