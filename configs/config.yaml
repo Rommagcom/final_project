@@ -30,4 +30,4 @@ daily_etl:
       - products
       - store_types
       - stores
-      - out_of_stock_api    
+      - out_of_stock   

@@ -82,7 +82,8 @@ def load_to_silver_tables_spark(table,**context):
     logging.info(f"Loading table {table} from Bronze to process")
 
     if table=='out_of_stock_api':
-        tableDf = spark.read.load(os.path.join('new_datalake','bronze','dshop','out_of_stock_api',for_date)
+        table='out_of_stock'
+        tableDf = spark.read.load(os.path.join('new_datalake','bronze','dshop','out_of_stock',for_date)
             ,header = "true"
             ,inferSchema = "true"
             , format = "json")
@@ -133,7 +134,7 @@ def load_to_dwh(table,**context):
     gp_properties = {"user": gp_conn.login, "password": gp_conn.password}
 
     tableDf = spark.read.parquet(os.path.join('new_datalake','silver','dshop',table))
-    tableDf.write.jdbc(gp_url,table=table,properties=gp_properties)
+    tableDf.write.jdbc(gp_url,table=table,properties=gp_properties,mode='append')
     
 
     logging.info("Successfully loaded to dwh")
