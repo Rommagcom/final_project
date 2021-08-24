@@ -10,7 +10,7 @@ import pyspark
 from pyspark.sql import SparkSession
 
 
-def load_to_bronze(table, **context):
+def load_from_db(table, **context):
 
     execution_date = context['execution_date']
     for_date = execution_date.strftime("%Y-%m-%d")
@@ -26,7 +26,7 @@ def load_to_bronze(table, **context):
             cursor.copy_expert(f"COPY {table} TO STDOUT WITH HEADER CSV", csv_file)
     logging.info("Successfully loaded")
 
-def load_to_bronze_from_api(load_for_date, **context):
+def load_from_api(load_for_date, **context):
 
    
     hdfs_conn = BaseHook.get_connection('datalake_hdfs')
@@ -67,7 +67,7 @@ def load_to_bronze_from_api(load_for_date, **context):
    
      
 
-def load_to_silver_tables_spark(table,**context):
+def load_to_silver(table,**context):
 
     this_folder = os.path.dirname(os.path.abspath(__file__))
     spark = SparkSession.builder\

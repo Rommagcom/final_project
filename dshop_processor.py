@@ -5,7 +5,7 @@ from datetime import datetime, date
 import os
 import yaml
 
-from functions.load_to_bronze_silver import load_to_bronze_from_api, load_to_bronze,load_to_silver_tables_spark,load_to_dwh
+from functions.dshop_processing_func import load_from_api, load_from_db,load_to_silver,load_to_dwh
 
 default_args = {
     "owner": "airflow",
@@ -26,7 +26,7 @@ def return_tables(source):
 def load_to_bronze_out_of_stock(for_date):
     return PythonOperator(
         task_id="load_for_"+for_date+"_to_bronze",
-        python_callable=load_to_bronze_from_api,
+        python_callable=load_from_api,
         op_kwargs={"load_for_date": for_date},
         provide_context=True,
     )
@@ -34,7 +34,7 @@ def load_to_bronze_out_of_stock(for_date):
 def load_to_bronze_db_tables(value):
     return PythonOperator(
         task_id="load_"+value+"_to_bronze",
-        python_callable=load_to_bronze,
+        python_callable=load_from_db,
         op_kwargs={"table": value},
         provide_context=True,
     )
@@ -42,7 +42,7 @@ def load_to_bronze_db_tables(value):
 def load_to_silver_group(value):
     return PythonOperator(
         task_id="load_"+value+"_to_silver",
-        python_callable=load_to_silver_tables_spark,
+        python_callable=load_to_silver,
         op_kwargs={"table": value},
         provide_context=True,
     )
@@ -96,10 +96,10 @@ for call_date in return_dates():
     dummy1 >> load_to_bronze_out_of_stock(call_date.strftime("%Y-%m-%d")) >> dummy2
 
 for table in return_tables('postgresql'):
-    dummy1 >> load_to_bronze_db_tables(table) >> dummy2
+    dummy1 >> load_to_bronze_db_tables(table) >> dummy2 >> dummy3
 
 for table in return_tables('loadtosilver'):
-    dummy3 >> load_to_silver_group(table) >> dummy4
+    dummy3 >> load_to_silver_group(table) >> dummy4 >> dummy5
 
 for table in return_tables('loadtodwh'):
     dummy5 >> load_to_dwh_group(table) >> dummy6

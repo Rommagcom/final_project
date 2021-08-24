@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 import yaml
 
-from functions.load_to_bronze_silver import load_to_dwh
+from functions.dshop_processing_func import load_to_dwh
 
 default_args = {
     "owner": "airflow",
