@@ -14,11 +14,11 @@ def load_to_bronze(table, **context):
 
     execution_date = context['execution_date']
     for_date = execution_date.strftime("%Y-%m-%d")
-    hdfs_conn = BaseHook.get_connection('webhdfs_default')
+    hdfs_conn = BaseHook.get_connection('datalake_hdfs')
     pg_conn = BaseHook.get_connection('oltp_postgres')
    
     logging.info(f"Writing table {table} for date {for_date} from {pg_conn.host} to Bronze")
-    client = InsecureClient(f"http://{hdfs_conn.host}:{hdfs_conn.port}/, user={hdfs_conn.login}")
+    client = InsecureClient("http://"+hdfs_conn.host, user=hdfs_conn.login)
     
     with psycopg2.connect(dbname='dshop_bu', user=pg_conn.login, password=pg_conn.password, host=pg_conn.host) as pg_connection:
         cursor = pg_connection.cursor()
@@ -29,12 +29,12 @@ def load_to_bronze(table, **context):
 def load_to_bronze_from_api(load_for_date, **context):
 
    
-    hdfs_conn = BaseHook.get_connection('webhdfs_default')
+    hdfs_conn = BaseHook.get_connection('datalake_hdfs')
     api_conn_auth = BaseHook.get_connection('https_outofstock')
     api_conn_get_data = BaseHook.get_connection('https_outofstock_get')
    
     logging.info(f"Getting OAuth token from API {api_conn_auth.host} with cred {api_conn_auth.extra}")
-    client = InsecureClient(f"http://{hdfs_conn.host}:{hdfs_conn.port}/, user={hdfs_conn.login}")
+    client = InsecureClient("http://"+hdfs_conn.host, user=hdfs_conn.login)
     
     my_headers = {'Content-Type' : 'application/json'}
     
