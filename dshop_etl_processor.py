@@ -56,7 +56,7 @@ def load_to_dwh_group(value):
     )
 
 dag = DAG(
-    dag_id="dshop_data_processing",
+    dag_id="dshop_etl_processing",
     description="DShop data processing, getting data from db, api -> cleaning, loading to silver and DWH",
     schedule_interval="0 0 * * *",
     start_date=datetime(2021, 8, 24)
